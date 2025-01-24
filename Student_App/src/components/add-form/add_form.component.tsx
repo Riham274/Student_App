@@ -1,9 +1,10 @@
 
-import { useState } from 'react';
+import { useState ,useEffect } from 'react';
 import './add-form.css'
 import { IStudent } from '../types';
 import CoursesListForm from '../courses-list-form/courses-list-form.component';
 import  {validateStudent } from '../../utils/validation.ts';
+import { useNavigate } from 'react-router-dom';
 
 /*
 const Addform = () => {
@@ -50,28 +51,29 @@ const Addform = () => {
     )
 }
 */  
-const INITIAL_STUDENT = {age:0 , CoursesList : [] , isGraduated:false , name : '' , id:'' };
-interface IProps {
-    onSubmit : (std : IStudent) => void;
-    className ?: string;
 
+const INITIAL_STUDENT = {age:0 , CoursesList : [] , isGraduated: false , name : '' , id:'' , absents : 0 };
+
+interface IProps {
+    className ?: string;
+    onSubmit : (std : IStudent) => void;
 } 
 
-
-// replace 3 usestate to 1 usestate :
-
 const Addform = (props : IProps) => {
-
     const [student,setStudent] = useState<IStudent>(INITIAL_STUDENT);
-    //const [name , setname]= useState("ahmad")
     const [isOpen,setIsOpen] = useState(false);
-
     const [errorsList,setErrorsList] = useState<string[]>([]);
+    const [message, setMessage] = useState('');
+    const nav = useNavigate();
+
+    useEffect( () => {
+        console.log("hello from add form")
+    },[]);
 
     const handleChange = (field :string , value : any) => {
         setStudent({...student, [field] :value})
 
-        /*if (field === 'name') {
+     /*if (field === 'name') {
         setStudent({...student, name : value});
         else if (field === 'age') {
             setStudent({...student, age : value});
@@ -91,8 +93,14 @@ const Addform = (props : IProps) => {
        }
 
     else
-    { props.onSubmit(newStudent);
+    {  setErrorsList([]);
+       props.onSubmit(newStudent);
        handleClear();
+
+       setMessage('Student Added Successfully');
+      setTimeout(() => {
+        nav('/');
+      }, 1500);
     }
    } 
    
@@ -149,17 +157,16 @@ const Addform = (props : IProps) => {
                 <button onClick={handleClear}>Clear</button>
             </div>
          {
-            errorsList.length > 0 ? (
-            <div>
-                <h4>You have the following error/s </h4>
-                {
-                    errorsList.map(error => <p key={error}>{error}</p>)
-                }
-
-            </div>
-            )
-            : null
-          }
+            Boolean(errorsList.length) && (
+          <div className='report'>
+            <h4>You have the following error/s:</h4>
+            {
+              errorsList.map(error => <p key={error}>- {error}</p>)
+            }
+          </div>
+        )
+     }
+      {Boolean(message) && <h4>{message}</h4>}
         </div>
     )
 }
@@ -167,3 +174,6 @@ const Addform = (props : IProps) => {
 
 
 export default Addform;
+
+
+
